@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Timer Daget/title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* FONT DIGITAL */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
+/* BODY / LAYOUT */
+body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle at top, #0b1d26, #000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+}
+
+.box {
+    text-align: center;
+    padding: 35px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.05);
+    box-shadow: 0 0 40px rgba(0,255,255,0.25);
+    width: 90%;
+    max-width: 360px;
+}
+
+/* TIMER DIGITAL */
+.timer {
+    font-size: 54px;
+    font-weight: 700;
+    color: #00ffe7;
+    text-shadow: 0 0 10px #00ffe7, 0 0 25px #00ffe7;
+    animation: pulse 1.2s infinite;
+    letter-spacing: 3px;
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* DAGET EFFECT */
+.daget {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ff003c;
+    text-shadow: 0 0 10px #ff003c, 0 0 30px #ff003c;
+    margin-bottom: 15px;
+    animation: dagetFlash 0.6s infinite alternate;
+}
+@keyframes dagetFlash {
+    from { opacity: 0.4; }
+    to { opacity: 1; }
+}
+
+/* FOLLOW BUTTON */
+.follow-btn {
+    display: none; /* muncul setelah timer habis / DAGET */
+    margin-top: 20px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #00ffe7, #0077ff);
+    color: #000;
+    font-weight: 700;
+    border-radius: 10px;
+    text-decoration: none;
+    box-shadow: 0 0 20px rgba(0,255,255,0.6);
+}
+
+/* QRIS */
+.qris {
+    display: none;
+    margin-top: 15px;
+    animation: fadeIn 1s ease forwards;
+}
+.qris img {
+    width: 100%;
+    border-radius: 14px;
+    box-shadow: 0 0 25px rgba(0,255,255,0.7), 0 0 60px rgba(0,255,255,0.4);
+}
+.note {
+    margin-top: 10px;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+
+    <!-- =============================
+         TIMER DIGITAL
+         ============================= -->
+    <div id="timer" class="timer"></div>
+
+    <!-- =============================
+         DAGET EFFECT
+         ============================= -->
+    <div class="daget" id="daget" style="display:none;">⚡ DAGET ⚡</div>
+
+    <!-- =============================
+         FOLLOW BUTTON
+         muncul pas DAGET
+         ============================= -->
+    <a href="https://whatsapp.com/channel/0029Vb76JSUHVvTVNPRIPP3v" target="_blank" id="followBtn" class="follow-btn">
+        📢 FOLLOW CHANNEL
+    </a>
+
+    <!-- =============================
+         QRIS PAYMENT
+         muncul setelah FOLLOW
+         ============================= -->
+    <div id="qris" class="qris">
+        <img src="https://files.catbox.moe/5k4fzd.jpg" alt="QRIS Payment">
+        <div class="note">Scan QRIS untuk melanjutkan pembayaran</div>
+    </div>
+
+</div>
+
+<script>
+/* ======================================================
+   SETTING TIMER
+   ====================================================== */
+
+// TOTAL_TIME = durasi timer dalam detik
+// 60 = 1 menit, 300 = 5 menit, 600 = 10 menit
+const TOTAL_TIME = 300;
+
+// STORAGE_KEY = nama key localStorage
+// dipakai untuk nyimpen waktu akhir timer
+// supaya timer TIDAK RESET walau refresh / keluar browser
+const STORAGE_KEY = "qris_timer_follw";
+
+/* ======================================================
+   ELEMENT HTML
+   ====================================================== */
+
+const timerEl = document.getElementById("timer"); // angka timer
+const dagetEl = document.getElementById("daget"); // DAGET
+const followBtn = document.getElementById("followBtn"); // tombol FOLLOW
+const qrisEl = document.getElementById("qris"); // QRIS
+
+/* ======================================================
+   AMBIL / SET WAKTU AKHIR (ANTI RESET)
+   ====================================================== */
+
+// ambil waktu akhir dari localStorage
+let endTime = localStorage.getItem(STORAGE_KEY);
+
+// kalau belum ada (pertama kali buka)
+if (!endTime) {
+    // set endTime = sekarang + TOTAL_TIME detik
+    endTime = Date.now() + TOTAL_TIME * 1000;
+    // simpan ke localStorage supaya tetep jalan walau refresh
+    localStorage.setItem(STORAGE_KEY, endTime);
+}
+
+/* ======================================================
+   HITUNG MUNDUR TIMER
+   ====================================================== */
+
+const countdown = setInterval(() => {
+    const now = Date.now(); // waktu sekarang
+    const remaining = Math.floor((endTime - now) / 1000); // sisa waktu dalam detik
+
+    // kalau waktu habis
+    if (remaining <= 0) {
+        clearInterval(countdown); // hentikan interval
+        timerEl.style.display = "none"; // sembunyikan timer
+        dagetEl.style.display = "block"; // tampilkan DAGET
+        followBtn.style.display = "inline-block"; // tampilkan tombol FOLLOW
+        return;
+    }
+
+    // konversi sisa detik ke menit : detik
+    const m = String(Math.floor(remaining / 60)).padStart(2, "0");
+    const s = String(remaining % 60).padStart(2, "0");
+    timerEl.textContent = `${m}:${s}`;
+}, 1000); // update tiap 1 detik
+
+/* ======================================================
+   FOLLOW CLICK → UNLOCK QRIS
+   ====================================================== */
+
+// begitu tombol FOLLOW diklik → QRIS muncul
+followBtn.addEventListener("click", () => {
+    qrisEl.style.display = "block";
+});
+</script>
+
+</body>
+</html>
