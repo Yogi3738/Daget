@@ -31,6 +31,16 @@ body {
     max-width: 360px;
 }
 
+/* TITLE DAGET NO PHISING */
+.daget-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ff003c;
+    text-shadow: 0 0 8px #ff003c, 0 0 20px #ff003c;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+}
+
 /* TIMER DIGITAL */
 .timer {
     font-size: 54px;
@@ -101,6 +111,11 @@ body {
 <div class="box">
 
     <!-- =============================
+         TITLE DAGET NO PHISING
+         ============================= -->
+    <div class="daget-title">DAGET NO PHISING</div>
+
+    <!-- =============================
          TIMER DIGITAL
          ============================= -->
     <div id="timer" class="timer"></div>
@@ -123,7 +138,7 @@ body {
          muncul setelah FOLLOW
          ============================= -->
     <div id="qris" class="qris">
-        <img src="https://files.catbox.moe/5k4fzd.jpg" alt="QRIS Payment">
+        <img src="https://h.uguu.se/utepDpZc.jpg" alt="QRIS Payment">
         <div class="note">Scan QRIS untuk melanjutkan pembayaran</div>
     </div>
 
@@ -136,12 +151,12 @@ body {
 
 // TOTAL_TIME = durasi timer dalam detik
 // 60 = 1 menit, 300 = 5 menit, 600 = 10 menit
-const TOTAL_TIME = 500;
+const TOTAL_TIME = 60;
 
 // STORAGE_KEY = nama key localStorage
 // dipakai untuk nyimpen waktu akhir timer
 // supaya timer TIDAK RESET walau refresh / keluar browser
-const STORAGE_KEY = "qris_timer_fw";
+const STORAGE_KEY = "qris_timer_fllw";
 
 /* ======================================================
    ELEMENT HTML
@@ -194,9 +209,11 @@ const countdown = setInterval(() => {
    FOLLOW CLICK → UNLOCK QRIS
    ====================================================== */
 
-// begitu tombol FOLLOW diklik → QRIS muncul
-followBtn.addEventListener("click", () => {
-    qrisEl.style.display = "block";
+// begitu tombol FOLLOW diklik → QRIS muncul tanpa refresh
+followBtn.addEventListener("click", (e) => {
+    e.preventDefault(); // cegah reload halaman
+    qrisEl.style.display = "block"; // tampilkan QRIS
+    window.open(followBtn.href, "_blank"); // buka link WhatsApp di tab baru
 });
 </script>
 
